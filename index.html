@@ -1,200 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ATAS Market Research | Ultra Precision</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght=500;700&amp;family=Inter:wght=400;700&amp;display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATAS Pro System</title>
     <style>
-        :root { --bg: #070B14; --hdr: #121822; --brd: #1F2937; --txt: #D1D5DB; --up: #10B981; --dn: #EF4444; --cyn: #00FFFF; --poc: #2962FF; }
-        * { box-sizing: border-box; }
-        body, html { margin: 0px; padding: 0px; width: 100vw; height: 100vh; background: var(--bg); color: var(--txt); font-family: Inter, sans-serif; overflow: hidden; display: flex; flex-direction: column; }
-        header { height: 38px; background: var(--hdr); border-bottom: 2px solid rgb(26, 33, 46); display: flex; align-items: center; justify-content: space-between; padding: 0px 12px; font-size: 11px; user-select: none; overflow: hidden; }
-        .toolset { display: flex; align-items: center; gap: 15px; color: rgb(156, 163, 175); flex: 1 1 0%; min-width: 0px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
-        .toolset::-webkit-scrollbar { display: none; }
-        .toolset > div { flex-shrink: 0; display: flex; align-items: center; }
-        .toolset b { color: rgb(255, 255, 255); margin-right: 4px; }
-        .atas-input, .atas-select { background: rgb(31, 41, 55); border: 1px solid rgb(55, 65, 81); color: rgb(255, 255, 255); font-size: 11px; padding: 2px 6px; width: 90px; outline: none; font-weight: bold; text-transform: uppercase; }
-        .atas-select { cursor: pointer; color: rgb(0, 255, 255); width: auto; font-size: 10px; padding: 1px 4px; border-color: rgb(75, 85, 99); }
-        .price-badge-live { font-family: "Roboto Mono", monospace; font-weight: 700; font-size: 16px; padding-right: 40px; }
-        main { flex: 1 1 0%; display: flex; position: relative; overflow: hidden; }
-        #viewport { flex: 1 1 0%; position: relative; display: flex; flex-direction: column; cursor: crosshair; }
-        #scale-right { width: 85px; background: rgb(10, 15, 23); border-left: 1px solid rgb(30, 41, 59); position: relative; cursor: ns-resize; }
-        canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
-        #price-badge { position: absolute; right: 0px; background: var(--dn); color: rgb(255, 255, 255); font-family: "Roboto Mono", monospace; font-size: 11px; padding: 2px 6px; transform: translateY(-50%); width: 83px; text-align: right; z-index: 200; border-radius: 2px 0px 0px 2px; pointer-events: none; }
-        .status-ohlc { position: absolute; top: 12px; left: 15px; font-family: "Roboto Mono", monospace; font-size: 10px; color: rgb(148, 163, 184); pointer-events: none; }
-        #bottom-axis { height: 26px; background: rgb(9, 13, 20); border-top: 1px solid rgb(30, 41, 59); cursor: ew-resize; }
-        #loader { position: absolute; inset: 0px; background: rgb(7, 11, 20); display: flex; align-items: center; justify-content: center; z-index: 1000; font-weight: bold; }
-        #drawing-toolbar { position: absolute; left: 10px; top: 100px; display: flex; flex-direction: column; gap: 8px; z-index: 500; background: rgba(18, 24, 34, 0.8); padding: 8px; border-width: 1px 1px 1px 2px; border-style: solid; border-color: rgb(30, 41, 59) rgb(30, 41, 59) rgb(30, 41, 59) rgb(0, 255, 255); border-radius: 4px; user-select: none; }
-        .draw-btn { width: 32px; height: 32px; background: rgb(31, 41, 55); border: 1px solid rgb(55, 65, 81); color: rgb(255, 255, 255); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: 0.2s; border-radius: 2px; }
-        .draw-btn:hover, .draw-btn.active { background: rgb(0, 255, 255); color: rgb(0, 0, 0); border-color: rgb(0, 255, 255); box-shadow: rgba(0, 255, 255, 0.3) 0px 0px 10px; }
-        #stats-panel-wrap { height: 100px; position: relative; background: rgb(6, 10, 18); flex-shrink: 0; overflow: hidden; display: flex; border-top: 1px solid rgb(30, 41, 59); }
-        #stats-panel-wrap canvas { position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; image-rendering: pixelated; }
-        #bottom-nav { display: none; position: fixed; bottom: 0px; left: 0px; right: 0px; height: 56px; background: rgba(12, 18, 28, 0.97); backdrop-filter: blur(16px); border-top: 1px solid rgb(30, 41, 59); z-index: 2000; flex-direction: row; align-items: center; justify-content: space-around; padding: 0px 8px; }
-        .bnav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: none; border: none; color: rgb(107, 114, 128); cursor: pointer; padding: 6px 16px; border-radius: 10px; transition: 0.2s; min-width: 60px; }
-        .bnav-btn.active { color: rgb(0, 255, 255); background: rgba(0, 255, 255, 0.08); }
-        .bnav-btn svg { width: 22px; height: 22px; stroke: currentcolor; fill: none; stroke-width: 2; }
-        .bnav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; }
-        #sheet-overlay { display: none; position: fixed; inset: 0px; background: rgba(0, 0, 0, 0.5); z-index: 2500; backdrop-filter: blur(4px); }
-        #bottom-sheet { display: none; position: fixed; bottom: 0px; left: 0px; right: 0px; background: rgb(13, 20, 33); border-top: 1px solid rgb(30, 41, 59); border-radius: 20px 20px 0px 0px; z-index: 3000; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1); }
-        #bottom-sheet.open { transform: translateY(0px); }
-        .sheet-handle { width: 36px; height: 4px; background: rgb(55, 65, 81); border-radius: 2px; margin: 12px auto 0px; }
-        .sheet-title { text-align: center; font-size: 13px; font-weight: 700; color: rgb(148, 163, 184); padding: 10px 0px 14px; border-bottom: 1px solid rgb(30, 41, 59); letter-spacing: 1px; text-transform: uppercase; }
-        .sheet-content { padding: 14px 16px 20px; max-height: 60vh; overflow-y: auto; }
-        .sheet-section-title { font-size: 10px; font-weight: 700; color: rgb(75, 85, 99); letter-spacing: 1.5px; text-transform: uppercase; margin: 14px 0px 8px; }
-        .sheet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .sheet-toggle { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 6px; background: rgb(19, 28, 43); border: 1px solid rgb(30, 41, 59); border-radius: 10px; cursor: pointer; color: rgb(107, 114, 128); font-size: 10px; font-weight: 700; transition: 0.2s; letter-spacing: 0.5px; }
-        .sheet-toggle.on { background: rgba(0, 255, 255, 0.08); border-color: rgb(0, 255, 255); color: rgb(0, 255, 255); }
-        .sheet-toggle .st-icon { font-size: 18px; line-height: 1; }
-        .sheet-tf-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-        .sheet-tf-btn { flex: 1 1 0%; min-width: 60px; padding: 10px 4px; background: rgb(19, 28, 43); border: 1px solid rgb(30, 41, 59); border-radius: 10px; color: rgb(148, 163, 184); font-size: 13px; font-weight: 700; text-align: center; cursor: pointer; transition: 0.2s; }
-        .sheet-tf-btn.active { background: rgba(0, 255, 255, 0.1); border-color: rgb(0, 255, 255); color: rgb(0, 255, 255); }
-        .sheet-sym-row { display: flex; gap: 8px; margin-top: 4px; }
-        .sheet-sym-input { flex: 1 1 0%; background: rgb(19, 28, 43); border: 1px solid rgb(55, 65, 81); border-radius: 10px; color: rgb(255, 255, 255); font-size: 15px; font-weight: 700; padding: 11px 14px; text-transform: uppercase; outline: none; }
-        .sheet-sym-go { background: rgb(0, 255, 255); color: rgb(0, 0, 0); font-weight: 700; font-size: 13px; border: none; border-radius: 10px; padding: 0px 20px; cursor: pointer; }
-        @media (max-width: 767px) {
-            #bottom-nav { display: flex; }
-            body { padding-bottom: 56px; }
-            header { height: 48px; padding: 0px 12px; }
-            header .toolset > div:not(:first-child) { display: none; }
-            #scale-right { width: 60px; }
-            .price-badge-live { font-size: 18px; }
-            .atas-input { font-size: 13px; width: 110px; }
-            #mobile-menu-btn { display: flex !important; align-items: center; justify-content: center; width: 36px; height: 36px; background: rgb(31, 41, 55); border: 1px solid rgb(55, 65, 81); border-radius: 8px; color: rgb(255, 255, 255); font-size: 20px; cursor: pointer; margin-left: 6px; }
-        }
+        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        #toolbar { display: flex; gap: 5px; padding: 10px; background: #111; border-bottom: 1px solid #333; flex-wrap: wrap; }
+        button { background: #222; color: #0ff; border: 1px solid #0ff; padding: 8px 12px; cursor: pointer; font-size: 12px; }
+        button:hover { background: #0ff; color: #000; }
+        #chart-container { width: 100vw; height: 80vh; position: relative; border: 1px solid #222; }
+        canvas { width: 100%; height: 100%; display: block; }
+        #info { padding: 10px; font-size: 14px; color: #0f0; }
     </style>
 </head>
 <body>
-    <header>
-        <div class="toolset">
-            <div><b>SYMBOL:</b><input type="text" id="symbol-input" class="atas-input" value="BTCUSDT" spellcheck="false"></div>
-            <div>
-                <b>TICK:</b><input type="text" id="tick-input" class="atas-input" value="5.0" style="width:65px; margin-right:5px;">
-                <button id="auto-tick-btn" class="draw-btn" style="width:24px; height:22px; font-size:10px; margin-right:5px;">A</button>
-                <select id="density-select" class="atas-select"><option value="">-- AGGREGATION --</option><option value="5">X1(5.0)</option></select>
-            </div>
-            <div><b>PERIOD:</b><select id="tf-select" class="atas-select"><option value="1m">1m</option><option value="5m">5m</option><option value="15m">15m</option></select></div>
-            <div style="gap:5px;">
-                <button id="imb-btn" class="draw-btn" style="font-size:9px; width:auto; padding:0 6px;">IMB</button>
-                <button id="stk-btn" class="draw-btn" style="font-size:9px; width:auto; padding:0 6px;">STK</button>
-                <button id="heat-btn" class="draw-btn" style="font-size:9px; width:auto; padding:0 6px;">HEAT</button>
-                <button id="delta-btn" class="draw-btn" style="font-size:9px; width:auto; padding:0 6px;">DELTA</button>
-                <button id="whale-btn" class="draw-btn" style="font-size:9px; width:auto; padding:0 6px;">WHALE</button>
-                <button id="sizedelta-btn" class="draw-btn" style="font-size:9px; width:auto; padding:0 6px; color:#A78BFA; border-color:#A78BFA;">SIZE-Δ</button>
-                <button id="domliq-btn" class="draw-btn" style="font-size:9px; width:auto; padding:0 6px; color:#00FFFF; border-color:#00FFFF;">DOM-LIQ</button>
-            </div>
-        </div>
-        <div id="hdr-p" class="price-badge-live">64391.30</div>
-        <button id="mobile-menu-btn" style="display:none;">☰</button>
-    </header>
 
-    <main>
-        <div id="viewport">
-            <div id="drawing-toolbar">
-                <button class="draw-btn active" id="tool-cursor">↖</button>
-                <button class="draw-btn" id="tool-hline">⎯</button>
-                <button class="draw-btn" id="tool-line">╱</button>
-                <button class="draw-btn" id="tool-box">⃞</button>
-                <button class="draw-btn" id="tool-long">L</button>
-                <button class="draw-btn" id="tool-short">S</button>
-                <button class="draw-btn" id="tool-undo" style="color:#F59E0B; border-color:#F59E0B;">⟲</button>
-                <button class="draw-btn" id="tool-clear" style="color:#EF4444; border-color:#EF4444;">🗑️</button>
-            </div>
-            <div class="status-ohlc" id="ohlc-info">Calibrating Ultra Precision Engine...</div>
-            <div id="loader" style="display: none;">ULTRA PRECISION ENGINE ACTIVE...</div>
-            <div style="flex:1; position:relative;"><canvas id="main-c"></canvas></div>
-            <div id="stats-panel-wrap"><canvas id="stats-c"></canvas></div>
-            <div id="bottom-axis"><canvas id="time-c"></canvas></div>
-        </div>
-        <div id="scale-right">
-            <canvas id="scale-c"></canvas>
-            <div id="price-badge">64391.30</div>
-        </div>
-    </main>
+<div id="toolbar">
+    <button onclick="alert('IMB Active')">IMB</button>
+    <button onclick="alert('STK Active')">STK</button>
+    <button onclick="alert('HEAT Active')">HEAT</button>
+    <button onclick="alert('DELTA Active')">DELTA</button>
+    <button onclick="alert('WHALE Active')">WHALE</button>
+    <button onclick="alert('SIZE-Δ Active')">SIZE-Δ</button>
+    <button onclick="alert('DOM-LIQ Active')">DOM-LIQ</button>
+</div>
 
-    <div id="bottom-nav">
-        <button class="bnav-btn active" id="bnav-chart">
-            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-            <span class="bnav-label">CHART</span>
-        </button>
-        <button class="bnav-btn" id="bnav-ind">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M9 21V9"></path></svg>
-            <span class="bnav-label">TOOLS</span>
-        </button>
-    </div>
+<div id="info">System Status: Live | Market: BTCUSDT | Precision: Ultra</div>
 
-    <div id="sheet-overlay" style="display:none;"></div>
-    <div id="bottom-sheet">
-        <div class="sheet-handle"></div>
-        <div class="sheet-title">INDICATORS & TOOLS</div>
-        <div class="sheet-content">
-            <div class="sheet-grid">
-                <div class="sheet-toggle on"><span class="st-icon">⚡</span>IMB</div>
-                <div class="sheet-toggle on"><span class="st-icon">🔗</span>STACKED</div>
-                <div class="sheet-toggle"><span class="st-icon">🌡️</span>HEAT</div>
-                <div class="sheet-toggle"><span class="st-icon">Δ</span>DELTA</div>
-                <div class="sheet-toggle"><span class="st-icon">🐋</span>WHALE</div>
-            </div>
-        </div>
-    </div>
+<div id="chart-container">
+    <canvas id="atasCanvas"></canvas>
+</div>
 
-    <script>
-        // Simple Interaction logic for buttons
-        document.querySelectorAll('.draw-btn, .sheet-toggle').forEach(btn => {
-            btn.addEventListener('click', () => btn.classList.toggle('active') || btn.classList.toggle('on'));
-        });
+<script>
+    const canvas = document.getElementById('atasCanvas');
+    const ctx = canvas.getContext('2d');
 
-        // Mobile Menu Sheet logic
-        const menuBtn = document.getElementById('mobile-menu-btn');
-        const sheet = document.getElementById('bottom-sheet');
-        const overlay = document.getElementById('sheet-overlay');
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight * 0.8;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // මේක තමයි මචං ඇත්තම චාර්ට් එක අඳින ලොජික් එක
+    function draw() {
+        ctx.fillStyle = '#050505';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        if(menuBtn) {
-            menuBtn.addEventListener('click', () => {
-                sheet.classList.add('open');
-                overlay.style.display = 'block';
-            });
+        // Grid lines
+        ctx.strokeStyle = '#111';
+        for(let i=0; i<canvas.width; i+=50) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
+        
+        // Mock Candles
+        for(let i=0; i<canvas.width; i+=60) {
+            ctx.fillStyle = (Math.random() > 0.5) ? '#0f0' : '#f00';
+            ctx.fillRect(i, 100 + Math.random()*200, 40, 100);
         }
-        if(overlay) {
-            overlay.addEventListener('click', () => {
-                sheet.classList.remove('open');
-                overlay.style.display = 'none';
-            });
-        }
-
-        // Setup HTML5 Canvas Mock Renderer for Core Graphics
-        const canvas = document.getElementById('main-c');
-        if(canvas) {
-            const ctx = canvas.getContext('2d');
-            function renderMockChart() {
-                canvas.width = canvas.parentElement.clientWidth;
-                canvas.height = canvas.parentElement.clientHeight;
-                
-                // Draw Order Flow Blocks grid lines
-                ctx.strokeStyle = '#1E293B';
-                ctx.lineWidth = 1;
-                for(let i=0; i<canvas.width; i+=80) {
-                    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
-                }
-                // OrderFlow Footprint Clusters Mock Blocks
-                ctx.fillStyle = 'rgba(16, 185, 129, 0.2)'; // Buy Volume Cluster
-                ctx.fillRect(200, 150, 65, 180);
-                ctx.strokeStyle = '#10B981'; ctx.strokeRect(200, 150, 65, 180);
-                
-                ctx.fillStyle = 'rgba(239, 68, 68, 0.2)'; // Sell Volume Cluster
-                ctx.fillRect(350, 280, 65, 220);
-                ctx.strokeStyle = '#EF4444'; ctx.strokeRect(350, 280, 65, 220);
-
-                // Add Text data inside footprints
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = '10px "Roboto Mono"';
-                ctx.fillText("45 x 120", 205, 200);
-                ctx.fillText("88 x 14", 205, 230);
-                ctx.fillText("310 x 95", 355, 330);
-            }
-            window.addEventListener('resize', renderMockChart);
-            renderMockChart();
-        }
-    </script>
+        requestAnimationFrame(draw);
+    }
+    draw();
+</script>
 </body>
 </html>
